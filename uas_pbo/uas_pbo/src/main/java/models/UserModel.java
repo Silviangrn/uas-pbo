@@ -1,0 +1,79 @@
+package models;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.sql.DataSource;
+
+import entities.UserEntity;
+
+public class UserModel {
+    private DataSource dataSource;
+
+    public UserModel(DataSource dataSource) {
+        this.dataSource = dataSource;
+    }
+
+    public void CreateUser (UserEntity user) {
+        String sql = "INSERT INTO user VALUES (?, ?, now())";
+
+        try (
+                Connection connection = dataSource.getConnection();
+                PreparedStatement stmt = connection.prepareStatement(sql)
+            )
+        {
+            stmt.setString(1, user.getUserid());
+            stmt.setString(2, user.getPassword());
+            stmt.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void ChangePass(UserEntity user) {
+        String sql = "UPDATE user SET password = ? WHERE userid = ?";
+
+        try (
+                Connection connection = dataSource.getConnection();
+                PreparedStatement stmt = connection.prepareStatement(sql)
+            )
+        {
+           stmt.setString(1, user.getPassword());
+           stmt.setString(2, user.getUserid());
+           stmt.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public UserEntity[] FindUser() {
+        String sql = "SELECT * FROM user";
+
+        try (
+                Connection connection = dataSource.getConnection();
+                Statement stmt = connection.createStatement();
+                ResultSet resultSet = stmt.executeQuery(sql)
+            )
+        {
+            List<UserEntity> list = new ArrayList<>();
+            while (resultSet.next()) {
+                UserEntity user = new UserEntity();
+                user.setUserid(resultSet.getString("userid"));
+                list.add(user);
+           }
+
+           return list.toArray(new UserEntity[]{});
+           
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+}

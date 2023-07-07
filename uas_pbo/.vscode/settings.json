@@ -1,0 +1,5 @@
+{
+    "java.configuration.updateBuildConfiguration": "interactive",
+    "workbench.colorTheme": "Dracula"   ,
+    "workbench.iconTheme": "vscode-icons"
+}
